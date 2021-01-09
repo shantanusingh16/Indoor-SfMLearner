@@ -25,8 +25,8 @@ def parse_args():
     parser.add_argument('--output_dir', type=str,
                         default='./outputs',
                         help='path to output directory')
-    parser.add_argument('--images_dir', type=str, default='',
-                        help='path to directory of images')
+    parser.add_argument('--data_dir', type=str, default='',
+                        help='path to root directory of images')
     parser.add_argument('--model_name', type=str,
                         default='weights_5f',
                         help='name of a pretrained model to use',
@@ -36,6 +36,8 @@ def parse_args():
     parser.add_argument("--no_cuda",
                         help='if set, disables CUDA',
                         action='store_true')
+    parser.add_argument('--eval_split_path', type=str, default='',
+                        help='path to txt file containing filepaths for evaluation')
 
     return parser.parse_args()
 
@@ -72,20 +74,19 @@ def inference(args):
     
     encoder, decoder, thisH, thisW = prepare_model_for_test(args, device)
 
-    if os.path.isdir(args.images_dir):
-        image_paths = [os.path.join(args.images_dir, filename) for filename in os.listdir(args.images_dir)
-                       if os.path.splitext(filename)[1] in ['.jpg', '.png']]
-    else:
-        raise Exception("Invalid image directory path: {}".format(args.images_dir))
-
-    output_dir = args.output_dir
-    os.makedirs(output_dir, exist_ok=True)
+    with open(args.eval_split_path, 'r') as f:
+        filepaths = f.readlines()
 
     with torch.no_grad():
-        for image_path in image_paths:
+        for filepath in filepaths:
+
+            folder, fileidx = filepath.split()
+
+            output_dir = args.output_dir
+            os.makedirs(os.path.join(output_dir, folder), exist_ok=True)
+
             # Load image and preprocess
-            input_image = pil.open(image_path).convert('RGB')
-            extension = image_path.split('.')[-1]
+            input_image = pil.open(os.path.join(args.data_dir, folder, '{}.png'.format(fileidx))).convert('RGB')
             original_width, original_height = input_image.size
             input_image = input_image.resize((thisH, thisW), pil.LANCZOS)
             input_image = transforms.ToTensor()(input_image).unsqueeze(0)
@@ -98,23 +99,21 @@ def inference(args):
             disp_resized = torch.nn.functional.interpolate(
                 disp, (original_height, original_width), mode="bilinear", align_corners=False)
 
-            filename = os.path.basename(image_path)
-
             # Saving numpy file
-            name_dest_npy = os.path.join(output_dir, filename.replace('.'+extension, '_depth.npy'))
+            name_dest_npy = os.path.join(output_dir, folder, '{}.npy'.format(fileidx))
             print("-> Saving depth npy to ", name_dest_npy)
             scaled_disp, _ = disp_to_depth(disp, 0.1, 10)
             np.save(name_dest_npy, scaled_disp.cpu().numpy())
 
             # Saving colormapped depth image
-            disp_resized_np = disp_resized.squeeze().cpu().numpy()
-            vmax = np.percentile(disp_resized_np, 95)
-            normalizer = mpl.colors.Normalize(vmin=disp_resized_np.min(), vmax=vmax)
+            depth = 1 / disp_resized.squeeze().cpu().numpy()
+            vmax = np.percentile(depth, 95)
+            normalizer = mpl.colors.Normalize(vmin=depth.min(), vmax=vmax)
             mapper = cm.ScalarMappable(norm=normalizer, cmap='magma')
-            colormapped_im = (mapper.to_rgba(disp_resized_np)[:, :, :3] * 255).astype(np.uint8)
+            colormapped_im = (mapper.to_rgba(depth)[:, :, :3] * 255).astype(np.uint8)
             im = pil.fromarray(colormapped_im)
 
-            name_dest_im = os.path.join(output_dir, filename.replace('.'+extension, '_depth.png'))
+            name_dest_im = os.path.join(output_dir, folder, '{}.png'.format(fileidx))
             print("-> Saving depth png to ", name_dest_im)
             im.save(name_dest_im)
 
