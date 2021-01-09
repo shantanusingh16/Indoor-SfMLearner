@@ -86,8 +86,9 @@ def inference(args):
             os.makedirs(os.path.join(output_dir, folder), exist_ok=True)
 
             # Load image and preprocess
-            input_image = pil.open(os.path.join(args.data_dir, folder, '{}.png'.format(fileidx))).convert('RGB')
-            original_width, original_height = input_image.size
+            input_image = pil.open(os.path.join(args.data_dir, 'imgs', folder, '{}.png'.format(fileidx))).convert('RGB')
+            original_width, original_height = np.load(os.path.join(args.data_dir, 'depths', folder,
+                                                                   '{}.npy'.format(fileidx))).shape[::-1]
             input_image = input_image.resize((thisH, thisW), pil.LANCZOS)
             input_image = transforms.ToTensor()(input_image).unsqueeze(0)
 
@@ -103,7 +104,7 @@ def inference(args):
             name_dest_npy = os.path.join(output_dir, folder, '{}.npy'.format(fileidx))
             print("-> Saving depth npy to ", name_dest_npy)
             scaled_disp, _ = disp_to_depth(disp, 0.1, 10)
-            np.save(name_dest_npy, scaled_disp.cpu().numpy())
+            np.save(name_dest_npy, scaled_disp.cpu().numpy()[0, 0, :, :])
 
             # Saving colormapped depth image
             depth = 1 / disp_resized.squeeze().cpu().numpy()
