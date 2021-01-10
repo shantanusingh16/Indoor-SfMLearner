@@ -103,11 +103,11 @@ def inference(args):
             # Saving numpy file
             name_dest_npy = os.path.join(output_dir, folder, '{}.npy'.format(fileidx))
             print("-> Saving depth npy to ", name_dest_npy)
-            scaled_disp, _ = disp_to_depth(disp_resized, 0.1, 10)
-            np.save(name_dest_npy, scaled_disp.cpu().numpy()[0, 0, :, :])
+            _, scaled_depth = disp_to_depth(disp_resized, 0.1, 10)
+            np.save(name_dest_npy, scaled_depth.cpu().numpy()[0, 0, :, :])
 
             # Saving colormapped depth image
-            depth = 1 / disp_resized.squeeze().cpu().numpy()
+            depth = scaled_depth.squeeze().cpu().numpy()
             vmax = np.percentile(depth, 95)
             normalizer = mpl.colors.Normalize(vmin=depth.min(), vmax=vmax)
             mapper = cm.ScalarMappable(norm=normalizer, cmap='magma')
