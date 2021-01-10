@@ -103,7 +103,7 @@ def inference(args):
             # Saving numpy file
             name_dest_npy = os.path.join(output_dir, folder, '{}.npy'.format(fileidx))
             print("-> Saving depth npy to ", name_dest_npy)
-            scaled_disp, _ = disp_to_depth(disp, 0.1, 10)
+            scaled_disp, _ = disp_to_depth(disp_resized, 0.1, 10)
             np.save(name_dest_npy, scaled_disp.cpu().numpy()[0, 0, :, :])
 
             # Saving colormapped depth image
