@@ -330,7 +330,8 @@ class ScannetTrainDataset(data.Dataset):
         # load segments
         if self.return_segment:
             filename_wo_extn = os.path.splitext(os.path.basename(line[0]))[0]
-            sp = self.segment_path + '/seg_{}.npz'.format(filename_wo_extn)
+            parent_dir = os.path.basename(os.path.dirname(line[0]))
+            sp = os.path.join(self.segment_path, parent_dir, 'seg_{}.npz'.format(filename_wo_extn))
             if sp in self.img_cache:
                 segments = self.img_cache[sp]
             else:
