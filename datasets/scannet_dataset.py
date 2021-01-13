@@ -292,12 +292,16 @@ class ScannetTrainDataset(data.Dataset):
             3       images resized to (self.width // 8, self.height // 8)
         """
         if not (self.is_train):
-            line = self.filenames[index]
-            line = os.path.join(self.data_path, line)
-            rgb, depth, norm, valid_mask = self.loader(line)
+            line = self.filenames[index].split()
+            rgb_path = os.path.join(self.data_path, line[0])
+            depth_path = os.path.join(self.data_path, line[1])
+            # rgb, depth, norm, valid_mask = self.loader(line)
 
-            rgb = Image.fromarray(rgb)
-            depth = Image.fromarray(depth)
+            # rgb = Image.fromarray(rgb)
+            # depth = Image.fromarray(depth)
+
+            rgb = self.get_color(rgb_path, False)
+            depth = self.get_depth(depth_path, False)
 
             rgb = self.to_tensor(self.resize[0](rgb))
             depth = self.to_tensor(self.resize[0](depth))
@@ -421,8 +425,12 @@ class ScannetTrainDataset(data.Dataset):
         return False
         # raise NotImplementedError
 
-    def get_depth(self, folder, frame_index, side, do_flip):
-        raise NotImplementedError
+    def get_depth(self, fp, do_flip):
+        depth = self.loader(fp)
+
+        if do_flip:
+            depth = cv2.flip(depth, 1)
+        return Image.fromarray(depth)
 
     def _get_intrinsics(self):
         # 640, 480

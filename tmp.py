@@ -18,9 +18,11 @@ np.random.seed(0)
 
 
 
-root_dir = '/mnt/storage/Projects/Pytorch-UNet/data/imgs'
+root_dir = '/mnt/storage/Projects/Pytorch-UNet/data'
+rgb_dir = os.path.join(root_dir, 'imgs')
+depth_dir = os.path.join(root_dir, 'depths')
 
-all_folders = [folder for folder in os.listdir(root_dir)]
+all_folders = [folder for folder in os.listdir(rgb_dir)]
 np.random.shuffle(all_folders)
 
 train_len = int(np.floor(len(all_folders) * 0.7))
@@ -28,11 +30,11 @@ train_folders = all_folders[:train_len]
 test_folders = all_folders[train_len:]
 
 
-scannet_train_depth_path = '/mnt/storage/Projects/Indoor-SfMLearner/splits/scannet_train_depth.txt'
+scannet_train_depth_path = 'splits/scannet_train_depth.txt'
 
 with open(scannet_train_depth_path, 'w') as f:
     for folder in train_folders:
-        filepaths = [os.path.join(folder, filename) for filename in os.listdir(os.path.join(root_dir, folder))]
+        filepaths = [os.path.join('imgs', folder, filename) for filename in os.listdir(os.path.join(rgb_dir, folder))]
         filepaths = sorted(filepaths, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
         for idx in range(4, len(filepaths) - 4, 1):
             f.write('{} {} {} {} {} {} {} {} {}\n'.format(filepaths[idx], filepaths[idx-4], filepaths[idx-3],
@@ -40,13 +42,11 @@ with open(scannet_train_depth_path, 'w') as f:
                                                         filepaths[idx + 2], filepaths[idx + 3], filepaths[idx + 4]))
 
 
-scannet_test_depth_path = '/mnt/storage/Projects/Indoor-SfMLearner/splits/scannet_test_depth.txt'
+scannet_test_depth_path = 'splits/scannet_test_depth.txt'
 
 with open(scannet_test_depth_path, 'w') as f:
     for folder in test_folders:
-        filepaths = [os.path.join(folder, filename) for filename in os.listdir(os.path.join(root_dir, folder))]
+        filepaths = [os.path.join(folder, filename) for filename in os.listdir(os.path.join(rgb_dir, folder))]
         filepaths = sorted(filepaths, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
-        for idx in range(4, len(filepaths) - 4, 1):
-            f.write('{} {} {} {} {} {} {} {} {}\n'.format(filepaths[idx], filepaths[idx-4], filepaths[idx-3],
-                                                        filepaths[idx-2], filepaths[idx-1], filepaths[idx + 1],
-                                                        filepaths[idx + 2], filepaths[idx + 3], filepaths[idx + 4]))
+        for filepath in filepaths:
+            f.write('{} {}\n'.format(os.path.join('imgs', filepath), os.path.join('depths', filepath)))
