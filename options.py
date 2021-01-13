@@ -44,7 +44,8 @@ class MonodepthOptions:
         self.parser.add_argument("--split",
                                  type=str,
                                  help="which training split to use",
-                                 default="nyu")
+                                 default="nyu",
+                                 choices=["nyu", "scannet"])
         self.parser.add_argument("--num_layers",
                                  type=int,
                                  help="number of resnet layers",
@@ -54,9 +55,9 @@ class MonodepthOptions:
                                  type=str,
                                  help="dataset to train on",
                                  default="nyu",
-                                 choices=["nyu"])
+                                 choices=["nyu", "scannet"])
         self.parser.add_argument("--png", default=True,
-                                 help="if set, trains from raw KITTI png files (instead of jpgs)",
+                                 help="if set, trains from raw png files (instead of jpgs)",
                                  )
 
         # 192, 640                         

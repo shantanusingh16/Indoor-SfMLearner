@@ -224,10 +224,13 @@ class Trainer:
         print("Training is using frames: \n  ", self.opt.frame_ids_to_train)
 
         # data
-        datasets_dict = {"nyu": datasets.NYUDataset }
+        datasets_dict = {"nyu": datasets.NYUDataset, "scannet": datasets.ScannetTrainDataset}
         self.dataset = datasets_dict[self.opt.dataset]
 
-        train_filenames = readlines('./splits/nyu_train_0_10_20_30_40.txt')
+        if self.opt.split == "nyu":
+            train_filenames = readlines('./splits/nyu_train_0_10_20_30_40.txt')
+        else:  # scannet
+            train_filenames = readlines('./splits/scannet_train_depth.txt')
 
         num_train_samples = len(train_filenames)
         self.num_total_steps = num_train_samples // self.opt.batch_size * self.opt.num_epochs
@@ -244,12 +247,15 @@ class Trainer:
             num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
 
         # validation
-        filenames = readlines('./splits/nyu_test.txt')
+        if self.opt.split == "nyu":
+            filenames = readlines('./splits/nyu_test.txt')
+        else:  # scannet
+            filenames = readlines('./splits/scannet_test_depth.txt')
         # filenames = [filename.replace("/p300/Code/self_depth/monodepth2/nyuv2/nyu_official",
         #                               self.opt.val_path) for filename in filenames]
-        val_dataset = datasets.NYUDataset(self.opt.val_path, filenames,
-                                          self.opt.height, self.opt.width,
-                                          [0], 1, is_train=False, return_segment=False)
+        val_dataset = self.dataset(self.opt.val_path, filenames,
+                                   self.opt.height, self.opt.width,
+                                   [0], 1, is_train=False, return_segment=False)
         self.val_dataloader = DataLoader(val_dataset, 1, shuffle=False, num_workers=2)
 
         self.writers = {}
