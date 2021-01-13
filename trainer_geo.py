@@ -255,7 +255,8 @@ class Trainer:
         #                               self.opt.val_path) for filename in filenames]
         val_dataset = self.dataset(self.opt.val_path, filenames,
                                    self.opt.height, self.opt.width,
-                                   [0], 1, is_train=False, return_segment=False)
+                                   [0], 1, is_train=False, return_segment=False,
+                                   shared_dict=shared_dict)
         self.val_dataloader = DataLoader(val_dataset, 1, shuffle=False, num_workers=2)
 
         self.writers = {}
@@ -278,7 +279,7 @@ class Trainer:
 
         print("Using split:\n  ", self.opt.split)
         print("There are {:d} training items and {:d} validation items\n".format(
-            len(train_dataset), -1))
+            len(train_dataset), len(val_dataset)))
 
         self.save_opts()
 

@@ -46,7 +46,9 @@ scannet_test_depth_path = 'splits/scannet_test_depth.txt'
 
 with open(scannet_test_depth_path, 'w') as f:
     for folder in test_folders:
-        filepaths = [os.path.join(folder, filename) for filename in os.listdir(os.path.join(rgb_dir, folder))]
-        filepaths = sorted(filepaths, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
+        filepaths = [(os.path.join('imgs', folder, filename),
+                      os.path.join('depths', folder, filename.replace('.png', '.npy')))
+                     for filename in os.listdir(os.path.join(rgb_dir, folder))]
+        filepaths = sorted(filepaths, key=lambda x: int(os.path.splitext(os.path.basename(x[0]))[0]))
         for filepath in filepaths:
-            f.write('{} {}\n'.format(os.path.join('imgs', filepath), os.path.join('depths', filepath)))
+            f.write('{} {}\n'.format(filepath[0], filepath[1]))

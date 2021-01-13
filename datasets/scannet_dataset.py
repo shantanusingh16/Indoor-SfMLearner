@@ -426,7 +426,7 @@ class ScannetTrainDataset(data.Dataset):
         # raise NotImplementedError
 
     def get_depth(self, fp, do_flip):
-        depth = self.loader(fp)
+        depth = np.load(fp)
 
         if do_flip:
             depth = cv2.flip(depth, 1)
