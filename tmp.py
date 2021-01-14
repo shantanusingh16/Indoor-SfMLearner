@@ -18,7 +18,7 @@ np.random.seed(0)
 
 
 
-root_dir = '/mnt/storage/Projects/Pytorch-UNet/data'
+root_dir = '/scratch/shantanu/scannet/data'
 rgb_dir = os.path.join(root_dir, 'imgs')
 depth_dir = os.path.join(root_dir, 'depths')
 
