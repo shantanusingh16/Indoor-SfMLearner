@@ -410,11 +410,12 @@ class ScannetTrainDataset(data.Dataset):
         return inputs
 
     def get_color(self, fp, do_flip):
-        if fp in self.img_cache:
+        if self.img_cache is not None and fp in self.img_cache:
             color = self.img_cache[fp]
         else:
             color = self.loader(fp)
-            self.img_cache[fp] = color
+            if self.img_cache is not None:
+                self.img_cache[fp] = color
 
         if do_flip:
             color = cv2.flip(color, 1)

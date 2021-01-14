@@ -237,7 +237,7 @@ class Trainer:
 
         train_dataset = self.dataset(
             self.opt.data_path, train_filenames, self.opt.height, self.opt.width,
-            self.opt.frame_ids, 1, is_train=True, 
+            self.opt.frame_ids, self.num_scales, is_train=True,
             segment_path=self.opt.segment_path,
             return_segment=True,
             shared_dict=shared_dict)
@@ -255,8 +255,7 @@ class Trainer:
         #                               self.opt.val_path) for filename in filenames]
         val_dataset = self.dataset(self.opt.val_path, filenames,
                                    self.opt.height, self.opt.width,
-                                   [0], 1, is_train=False, return_segment=False,
-                                   shared_dict=shared_dict)
+                                   [0], 1, is_train=False, return_segment=False)
         self.val_dataloader = DataLoader(val_dataset, 1, shuffle=False, num_workers=2)
 
         self.writers = {}
