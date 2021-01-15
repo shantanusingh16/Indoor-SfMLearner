@@ -333,19 +333,23 @@ class ScannetTrainDataset(data.Dataset):
             parent_dir = os.path.basename(os.path.dirname(line[0]))
             sp = os.path.join(self.segment_path, parent_dir, 'seg_{}.npz'.format(filename_wo_extn))
             if sp in self.img_cache:
-                segments = self.img_cache[sp]
+                segment = self.img_cache[sp]['segment_0']
             else:
-                segments = np.load(sp)
-                self.img_cache[sp] = {'segment_0': segments['segment_0']}
+                segment = cv2.resize(np.load(sp)['segment_0'], (self.width, self.height), interpolation=cv2.INTER_NEAREST)
+                self.img_cache[sp] = {'segment_0': segment}
 
-            for ind, i in enumerate(self.frame_idxs):
-                if not i in set([0]):
-                    continue
+            # for ind, i in enumerate(self.frame_idxs):
+            #     if not i in set([0]):
+            #         continue
+            #
+            #     segment = segments['segment_%d' % (ind)]
+            #     if do_flip:
+            #         segment = cv2.flip(segment, 1)
+            #     inputs[('segment', i, 0)] = self.to_tensor(segment).long() + 1
 
-                segment = segments['segment_%d' % (ind)]
-                if do_flip:
-                    segment = cv2.flip(segment, 1)
-                inputs[('segment', i, 0)] = self.to_tensor(segment).long() + 1
+            if do_flip:
+                segment = cv2.flip(segment, 1)
+            inputs[('segment', 0, 0)] = self.to_tensor(segment).long() + 1
 
         if self.debug:
             return inputs
