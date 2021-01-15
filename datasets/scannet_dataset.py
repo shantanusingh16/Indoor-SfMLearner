@@ -304,7 +304,7 @@ class ScannetTrainDataset(data.Dataset):
             depth = self.get_depth(depth_path, False)
 
             rgb = self.to_tensor(self.resize[0](rgb))
-            depth = self.to_tensor(self.resize[0](depth))
+            depth = self.to_tensor(cv2.resize(depth, (self.width, self.height)))
 
             K = self.K.copy()
             K[0, :] *= self.width
@@ -437,11 +437,11 @@ class ScannetTrainDataset(data.Dataset):
         # raise NotImplementedError
 
     def get_depth(self, fp, do_flip):
-        depth = np.load(fp)
+        depth = np.load(fp).astype(np.float32) / 1000.0
 
         if do_flip:
             depth = cv2.flip(depth, 1)
-        return Image.fromarray(depth)
+        return depth
 
     def _get_intrinsics(self):
         # 640, 480
