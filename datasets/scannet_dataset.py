@@ -407,6 +407,10 @@ class ScannetTrainDataset(data.Dataset):
             del inputs[("color", i, -1)]
             del inputs[("color_aug", i, -1)]
 
+        for key, val in inputs.items():
+            if torch.any(torch.isnan(val) | torch.isinf(val)).cpu().item():
+                print(self.filenames[index], key)
+
         return inputs
 
     def get_color(self, fp, do_flip):
