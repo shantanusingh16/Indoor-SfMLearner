@@ -332,11 +332,12 @@ class ScannetTrainDataset(data.Dataset):
             filename_wo_extn = os.path.splitext(os.path.basename(line[0]))[0]
             parent_dir = os.path.basename(os.path.dirname(line[0]))
             sp = os.path.join(self.segment_path, parent_dir, 'seg_{}.npz'.format(filename_wo_extn))
-            if sp in self.img_cache:
+            if self.img_cache is not None and sp in self.img_cache:
                 segment = self.img_cache[sp]['segment_0']
             else:
                 segment = cv2.resize(np.load(sp)['segment_0'], (self.width, self.height), interpolation=cv2.INTER_NEAREST)
-                self.img_cache[sp] = {'segment_0': segment}
+                if self.img_cache is not None:
+                    self.img_cache[sp] = {'segment_0': segment}
 
             # for ind, i in enumerate(self.frame_idxs):
             #     if not i in set([0]):

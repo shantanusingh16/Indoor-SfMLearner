@@ -239,8 +239,7 @@ class Trainer:
             self.opt.data_path, train_filenames, self.opt.height, self.opt.width,
             self.opt.frame_ids, self.num_scales, is_train=True,
             segment_path=self.opt.segment_path,
-            return_segment=True,
-            shared_dict=shared_dict)
+            return_segment=True)
 
         self.train_loader = DataLoader(
             train_dataset, self.opt.batch_size, True,
