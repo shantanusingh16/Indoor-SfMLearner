@@ -578,7 +578,7 @@ class Trainer:
             dso_depth = torch.gather(depth.view(self.opt.batch_size, -1), 1, flat)
 
             # generate pattern
-            meshgrid = np.meshgrid([-2, 0, 2],[-2, 0, 2], indexing='xy')
+            meshgrid = np.meshgrid([-2, 0, 2], [-2, 0, 2], indexing='xy')
             meshgrid = np.stack(meshgrid, axis=0).astype(np.float32)
             meshgrid = torch.from_numpy(meshgrid).to(dso_points.device).permute(1, 2, 0).view(1, 1, 9, 2)
             dso_points = dso_points.unsqueeze(2) + meshgrid

@@ -74,4 +74,8 @@ class DepthDecoder(nn.Module):
                     # normal = torch.cat((normal[:, :2, :, :], F.relu(normal[:, 2:, :, :])), dim=1)
                     self.outputs[("normal", i)] = F.normalize(normal, dim=1, p=2)
 
+        for key, val in self.outputs:
+            if torch.any(torch.isnan(val) | torch.isinf(val)).cpu().item():
+                raise Exception("Depth decoder produced invalid values")
+
         return self.outputs

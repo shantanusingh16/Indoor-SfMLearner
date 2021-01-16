@@ -45,7 +45,7 @@ if not os.path.exists(output_dir):
 def image2seg(folder, filename):
     image = cv2.imread(os.path.join(tgt_dir, folder, filename))
     image = cv2.resize(image, (640, 480))
-    segment = felzenszwalb(image, scale=100, sigma=0.5, min_size=50)
+    segment = felzenszwalb(image, scale=100, sigma=0.5, min_size=50).astype(np.int16)
 
     os.makedirs(os.path.join(output_dir, folder), exist_ok=True)
 
