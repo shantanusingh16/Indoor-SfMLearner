@@ -27,9 +27,14 @@ def parse_args():
                         help='path to output directory')
     parser.add_argument('--data_dir', type=str, default='',
                         help='path to root directory of images')
+    parser.add_argument('--num_scales', type=int, default=1,
+                        help='number of scales to use for depth decoder')
     parser.add_argument('--load_weights_folder', type=str,
                         default='ckpts/weights_5f',
                         help='path of the pretrained model to use')
+    parser.add_argument("--disable_median_scaling",
+                        help='if set, disables median scaling using gt depth',
+                        action='store_true')
     parser.add_argument("--no_cuda",
                         help='if set, disables CUDA',
                         action='store_true')
@@ -51,7 +56,7 @@ def prepare_model_for_test(args, device):
     encoder = networks.ResnetEncoder(18, False)
     decoder = networks.DepthDecoder(
         num_ch_enc=encoder.num_ch_enc, 
-        scales=range(1),
+        scales=range(args.num_scales),
     )
 
     encoder.load_state_dict({k: v for k, v in encoder_dict.items() if k in encoder.state_dict()})
@@ -71,8 +76,15 @@ def inference(args):
     
     encoder, decoder, thisH, thisW = prepare_model_for_test(args, device)
 
-    with open(args.eval_split_path, 'r') as f:
-        filepaths = f.readlines()
+    print("Input size: ({} {})".format(thisW, thisH))
+
+    if args.eval_split_path != '':
+        with open(args.eval_split_path, 'r') as f:
+            filepaths = f.readlines()
+    else:
+        filepaths = ['{} {}'.format(folder, os.path.splitext(filename)[0]) for folder in
+                     os.listdir(os.path.join(args.data_dir, 'imgs')) for filename in
+                     os.listdir(os.path.join(args.data_dir, 'imgs', folder))]
 
     with torch.no_grad():
         for filepath in filepaths:
@@ -101,6 +113,11 @@ def inference(args):
             name_dest_npy = os.path.join(output_dir, folder, '{}.npy'.format(fileidx))
             print("-> Saving depth npy to ", name_dest_npy)
             _, scaled_depth = disp_to_depth(disp_resized, 0.1, 10)
+
+            if not args.disable_median_scaling:
+                gt_depth = np.load(os.path.join(args.data_dir, 'depths', folder, '{}.npy'.format(fileidx)))
+                median_scaling_ratio = np.median(gt_depth) / np.median(scaled_depth.squeeze().cpu().numpy())
+                scaled_depth *= median_scaling_ratio
             np.save(name_dest_npy, scaled_depth.cpu().numpy()[0, 0, :, :])
 
             # Saving colormapped depth image
