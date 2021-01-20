@@ -27,12 +27,9 @@ def parse_args():
                         help='path to output directory')
     parser.add_argument('--data_dir', type=str, default='',
                         help='path to root directory of images')
-    parser.add_argument('--model_name', type=str,
-                        default='weights_5f',
-                        help='name of a pretrained model to use',
-                        choices=[
-                            "weights_3f",
-                            "weights_5f",])
+    parser.add_argument('--load_weights_folder', type=str,
+                        default='ckpts/weights_5f',
+                        help='path of the pretrained model to use')
     parser.add_argument("--no_cuda",
                         help='if set, disables CUDA',
                         action='store_true')
@@ -43,9 +40,9 @@ def parse_args():
 
 
 def prepare_model_for_test(args, device):
-    model_path = args.model_name
+    model_path = args.load_weights_folder
     print("-> Loading model from ", model_path)
-    model_path = os.path.join("ckpts", model_path)
+    # model_path = os.path.join("ckpts", model_path)
     encoder_path = os.path.join(model_path, "encoder.pth")
     decoder_path = os.path.join(model_path, "depth.pth")
     encoder_dict = torch.load(encoder_path, map_location=device)
