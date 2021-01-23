@@ -173,7 +173,7 @@ class Trainer:
 
         assert self.opt.frame_ids[0] == 0, "frame_ids must start with 0"
 
-        self.use_pose_net = True
+        self.use_pose_net = self.opt.pose_model_type != "ground_truth"
 
         self.models["encoder"] = networks.ResnetEncoder(
             self.opt.num_layers, self.opt.weights_init == "pretrained")
@@ -820,6 +820,8 @@ class Trainer:
         print("loading model from folder {}".format(self.opt.load_weights_folder))
 
         for n in self.opt.models_to_load:
+            if n not in self.models:
+                continue
             print("Loading {} weights...".format(n))
             path = os.path.join(self.opt.load_weights_folder, "{}.pth".format(n))
             model_dict = self.models[n].state_dict()

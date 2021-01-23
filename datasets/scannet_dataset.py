@@ -314,7 +314,7 @@ class ScannetTrainDataset(data.Dataset):
         inputs = {}
 
         do_color_aug = self.is_train and random.random() > 0.5
-        do_flip = self.is_train and random.random() > 0.5
+        do_flip = False #self.is_train and random.random() > 0.5
 
         line = self.filenames[index].split()
         # line = [l.replace("/group/nyu_depth_v2", self.data_path) for l in line]
@@ -435,7 +435,7 @@ class ScannetTrainDataset(data.Dataset):
 
     def get_pose(self, fp, do_flip):
         filename_wo_extn = os.path.splitext(os.path.basename(fp))[0]
-        folder = os.path.basename(fp)
+        folder = os.path.dirname(fp)
         pose_path = os.path.join(
             self.data_path,
             "poses",
