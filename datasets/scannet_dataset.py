@@ -324,6 +324,7 @@ class ScannetTrainDataset(data.Dataset):
                 continue
 
             inputs[("color", i, -1)] = self.get_color(line[ind], do_flip)
+            inputs[("pose", i)] = torch.from_numpy(self.get_pose(line[ind], do_flip))
             if self.debug:
                 inputs[("color", i, -1)] = self.to_tensor(self.get_color(line[ind], do_flip))
 
@@ -431,6 +432,22 @@ class ScannetTrainDataset(data.Dataset):
             # color = color.transpose(pil.FLIP_LEFT_RIGHT)
 
         return Image.fromarray(color)
+
+    def get_pose(self, fp, do_flip):
+        filename_wo_extn = os.path.splitext(os.path.basename(fp))[0]
+        folder = os.path.basename(fp)
+        pose_path = os.path.join(
+            self.data_path,
+            "poses",
+            folder,
+            "{}.txt".format(filename_wo_extn))
+
+        pose = np.loadtxt(pose_path).astype(np.float32)
+
+        if do_flip:
+            pass #todo implement flip for pose
+
+        return pose
 
     def check_depth(self):
         return False

@@ -365,6 +365,11 @@ class Trainer:
 
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features))
+        elif self.opt.pose_model_type == "ground_truth":
+            frame0_pose = inputs[('pose', 0)]
+            for f_i in self.opt.frame_ids_to_train[1:]:
+                framei_pose = inputs[('pose', f_i)]
+                outputs[("cam_T_cam", 0, f_i)] = torch.matmul(torch.pinverse(framei_pose), frame0_pose)
 
         self.generate_sparse_pred(inputs, outputs)
         losses = self.compute_losses(inputs, outputs)
