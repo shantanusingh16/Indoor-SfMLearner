@@ -435,7 +435,7 @@ class ScannetTrainDataset(data.Dataset):
 
     def get_pose(self, fp, do_flip):
         filename_wo_extn = os.path.splitext(os.path.basename(fp))[0]
-        folder = os.path.dirname(fp)
+        folder = os.path.basename(os.path.dirname(fp))
         pose_path = os.path.join(
             self.data_path,
             "poses",
