@@ -751,6 +751,10 @@ class Trainer:
         for l, v in losses.items():
             writer.add_scalar("{}".format(l), v, self.step)
 
+        os.makedirs(os.path.join(self.log_path, 'data'), exist_ok=True)
+        np.save(os.path.join(self.log_path, 'data', '{}.npy'.format(self.step)), outputs[("disp", 0, 0)])
+        np.save(os.path.join(self.log_path, 'data', '{}.npy'.format(self.step)), inputs[("color", 0, 0)])
+
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             writer.add_image(
                 "svo_{}/{}".format(0, j), 
