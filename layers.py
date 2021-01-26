@@ -166,6 +166,9 @@ class BackprojectDepth(nn.Module):
         cam_points = torch.cat([cam_points, self.ones], 1)
 
         if torch.any(torch.isnan(cam_points) | torch.isinf(cam_points)).cpu().item():
+            np.save('models/scannet_w_gtpose/depth.npy', depth.cpu().detach().numpy())
+            np.save('models/scannet_w_gtpose/inv_K.npy', inv_K.cpu().detach().numpy())
+            np.save('models/scannet_w_gtpose/cam_points.npy', cam_points.cpu().detach().numpy())
             raise Exception("Backproject module produced invalid values")
 
         return cam_points
