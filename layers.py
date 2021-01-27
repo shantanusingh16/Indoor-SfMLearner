@@ -165,12 +165,6 @@ class BackprojectDepth(nn.Module):
         cam_points = depth.view(self.batch_size, 1, -1) * cam_points
         cam_points = torch.cat([cam_points, self.ones], 1)
 
-        if torch.any(torch.isnan(cam_points) | torch.isinf(cam_points)).cpu().item():
-            np.save('models/scannet_w_gtpose/depth.npy', depth.cpu().detach().numpy())
-            np.save('models/scannet_w_gtpose/inv_K.npy', inv_K.cpu().detach().numpy())
-            np.save('models/scannet_w_gtpose/cam_points.npy', cam_points.cpu().detach().numpy())
-            raise Exception("Backproject module produced invalid values")
-
         return cam_points
 
 
@@ -196,12 +190,6 @@ class Project3D(nn.Module):
         pix_coords[..., 0] /= self.width - 1
         pix_coords[..., 1] /= self.height - 1
         pix_coords = (pix_coords - 0.5) * 2
-
-        if torch.any(torch.isnan(cam_points) | torch.isinf(cam_points)).cpu().item():
-            raise Exception("Project3D module produced invalid values for cam_points")
-
-        if torch.any(torch.isnan(pix_coords) | torch.isinf(pix_coords)).cpu().item():
-            raise Exception("Project3D module produced invalid values for pix_coords")
 
         return pix_coords, cam_points
 

@@ -81,7 +81,7 @@ def mat_3x3_inv(mat):
     max_vals = mat.max(1)[0].max(1)[0].view((-1, 1, 1))
     mat = mat / max_vals
 
-    det = mat_3x3_det(mat)
+    det = mat_3x3_det(mat) + 1e-6
     inv_det = 1.0 / det
 
     mat_inv = torch.zeros(mat.shape, device=mat.device)
@@ -126,6 +126,7 @@ def inv_SE3(G):
 
     Ginv = torch.cat([torch.cat([R, tp], dim=2).float(), filler], dim=1)
     return Ginv
+
 
 def compute_errors(gt, pred):
     """Computation of error metrics between predicted and ground truth depths
@@ -750,10 +751,6 @@ class Trainer:
         writer = self.writers[mode]
         for l, v in losses.items():
             writer.add_scalar("{}".format(l), v, self.step)
-
-        # os.makedirs(os.path.join(self.log_path, 'data'), exist_ok=True)
-        # np.save(os.path.join(self.log_path, 'data', '{}.npy'.format(self.step)), outputs[("disp", 0, 0)])
-        # np.save(os.path.join(self.log_path, 'data', '{}.npy'.format(self.step)), inputs[("color", 0, 0)])
 
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             writer.add_image(
