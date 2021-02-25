@@ -441,12 +441,17 @@ class HabitatTrainDataset(data.Dataset):
             "pose",
             "{}.npy".format(filename_wo_extn))
 
-        pose = np.load(pose_path).astype(np.float32)
+        robot_pose = np.load(pose_path).astype(np.float32)
+        left_local_cam = np.array([-0.25, 1, 0, 1])
+
+        left_world_cam = robot_pose @ left_local_cam
+
+        left_cam_pose = np.hstack([robot_pose[3, :3], left_world_cam])
 
         if do_flip:
             pass #todo implement flip for pose
 
-        return pose
+        return left_cam_pose
 
     def check_depth(self):
         return False
