@@ -434,14 +434,14 @@ class HabitatTrainDataset(data.Dataset):
 
     def get_pose(self, fp, do_flip):
         filename_wo_extn = os.path.splitext(os.path.basename(fp))[0]
-        folder = os.path.basename(os.path.dirname(fp))
+        folder = os.path.dirname(os.path.dirname(fp))
         pose_path = os.path.join(
             self.data_path,
-            "poses",
             folder,
-            "{}.txt".format(filename_wo_extn))
+            "pose",
+            "{}.npy".format(filename_wo_extn))
 
-        pose = np.loadtxt(pose_path).astype(np.float32)
+        pose = np.load(pose_path).astype(np.float32)
 
         if do_flip:
             pass #todo implement flip for pose
@@ -453,8 +453,7 @@ class HabitatTrainDataset(data.Dataset):
         # raise NotImplementedError
 
     def get_depth(self, fp, do_flip):
-        depth = np.load(fp).astype(np.float32) / 1000.0
-
+        depth = np.array(Image.open(fp)).astype(np.float32) / 1000.0
         if do_flip:
             depth = cv2.flip(depth, 1)
         return depth
