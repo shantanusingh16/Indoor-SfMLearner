@@ -225,13 +225,19 @@ class Trainer:
         print("Training is using frames: \n  ", self.opt.frame_ids_to_train)
 
         # data
-        datasets_dict = {"nyu": datasets.NYUDataset, "scannet": datasets.ScannetTrainDataset}
+        datasets_dict = {"nyu": datasets.NYUDataset,
+                         "scannet": datasets.ScannetTrainDataset,
+                         "habitat": datasets.HabitatTrainDataset}
         self.dataset = datasets_dict[self.opt.dataset]
 
         if self.opt.split == "nyu":
             train_filenames = readlines('./splits/nyu_train_0_10_20_30_40.txt')
-        else:  # scannet
+        elif self.opt.split == "scannet":
             train_filenames = readlines('./splits/scannet_train_depth.txt')
+        elif self.opt.split == "habitat":
+            train_filenames = readlines('./splits/habitat_train_depth.txt')
+        else:
+            raise NotImplementedError()
 
         num_train_samples = len(train_filenames)
         self.num_total_steps = num_train_samples // self.opt.batch_size * self.opt.num_epochs
@@ -249,8 +255,13 @@ class Trainer:
         # validation
         if self.opt.split == "nyu":
             filenames = readlines('./splits/nyu_test.txt')
-        else:  # scannet
+        elif self.opt.split == "scannet":
             filenames = readlines('./splits/scannet_test_depth.txt')
+        elif self.opt.split == "habitat":
+            filenames = readlines('./splits/habitat_test_depth.txt')
+        else:
+            raise NotImplementedError()
+
         # filenames = [filename.replace("/p300/Code/self_depth/monodepth2/nyuv2/nyu_official",
         #                               self.opt.val_path) for filename in filenames]
         val_dataset = self.dataset(self.opt.val_path, filenames,

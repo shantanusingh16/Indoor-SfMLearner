@@ -45,7 +45,7 @@ class MonodepthOptions:
                                  type=str,
                                  help="which training split to use",
                                  default="nyu",
-                                 choices=["nyu", "scannet"])
+                                 choices=["nyu", "scannet", "habitat"])
         self.parser.add_argument("--num_layers",
                                  type=int,
                                  help="number of resnet layers",
@@ -55,12 +55,11 @@ class MonodepthOptions:
                                  type=str,
                                  help="dataset to train on",
                                  default="nyu",
-                                 choices=["nyu", "scannet"])
-        self.parser.add_argument("--png", default=True,
+                                 choices=["nyu", "scannet", "habitat"])
+        self.parser.add_argument("--png", default=False,
                                  help="if set, trains from raw png files (instead of jpgs)",
                                  )
 
-        # 192, 640                         
         self.parser.add_argument("--height",
                                  type=int,
                                  help="input image height",
