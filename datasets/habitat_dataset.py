@@ -444,9 +444,9 @@ class HabitatTrainDataset(data.Dataset):
         robot_pose = np.load(pose_path).astype(np.float32)
         left_local_cam = np.array([-0.25, 1, 0, 1])
 
-        left_world_cam = robot_pose @ left_local_cam
+        left_world_cam = (robot_pose @ left_local_cam).reshape((3, 1))
 
-        left_cam_pose = np.hstack([robot_pose[3, :3], left_world_cam])
+        left_cam_pose = np.hstack([robot_pose[:3, :3], left_world_cam])
 
         if do_flip:
             pass #todo implement flip for pose
@@ -472,3 +472,19 @@ class HabitatTrainDataset(data.Dataset):
                                [0., 0., 1., 0.],
                                [0., 0., 0., 1.]], dtype="float32")
         return intrinsics
+
+
+
+
+# if __name__ == '__main__':
+#     data_path = '/mnt/storage2/data/jaidev/TestHabitat2'
+#     segment_path = '/mnt/storage2/data/jaidev/superpixels'
+#     train_filenames = ['2t7WUuJeko7/0/left_rgb/4.jpg 2t7WUuJeko7/0/left_rgb/0.jpg 2t7WUuJeko7/0/left_rgb/1.jpg 2t7WUuJeko7/0/left_rgb/2.jpg 2t7WUuJeko7/0/left_rgb/3.jpg 2t7WUuJeko7/0/left_rgb/5.jpg 2t7WUuJeko7/0/left_rgb/6.jpg 2t7WUuJeko7/0/left_rgb/7.jpg 2t7WUuJeko7/0/left_rgb/8.jpg',
+#                        '2t7WUuJeko7/0/left_rgb/5.jpg 2t7WUuJeko7/0/left_rgb/1.jpg 2t7WUuJeko7/0/left_rgb/2.jpg 2t7WUuJeko7/0/left_rgb/3.jpg 2t7WUuJeko7/0/left_rgb/4.jpg 2t7WUuJeko7/0/left_rgb/6.jpg 2t7WUuJeko7/0/left_rgb/7.jpg 2t7WUuJeko7/0/left_rgb/8.jpg 2t7WUuJeko7/0/left_rgb/9.jpg']
+#     height, width = 288, 384
+#     frame_ids = [0, -4, -3, -2, -1, 1, 2, 3, 4]
+#     num_scales = 4
+#     train_dataset = HabitatTrainDataset(data_path, train_filenames, height, width, frame_ids, num_scales,
+#                                         is_train=True, segment_path=segment_path, return_segment=True)
+#     data = train_dataset.__getitem__(0)
+#     print()
