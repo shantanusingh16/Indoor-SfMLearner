@@ -459,7 +459,7 @@ class Trainer:
         self.set_eval()
         errors = []
         with torch.no_grad():
-            for ind, (data, gt_depth, K, K_inv) in enumerate(tqdm(self.val_dataloader)):
+            for ind, (filename, data, gt_depth, K, K_inv) in enumerate(tqdm(self.val_dataloader)):
                 input_color = data.cuda()
 
                 output = self.models["depth"](self.models["encoder"](input_color))
@@ -476,6 +476,9 @@ class Trainer:
                 mask = gt_depth > 0
                 pred_depth = pred_depth[mask]
                 gt_depth = gt_depth[mask]
+
+                if len(pred_depth) == 0:
+                    print(filename.cpu().detach())
 
                 ratio = np.median(gt_depth) / np.median(pred_depth)
                 pred_depth *= ratio

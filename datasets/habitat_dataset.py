@@ -308,7 +308,7 @@ class HabitatTrainDataset(data.Dataset):
             K = self.K.copy()
             K[0, :] *= self.width
             K[1, :] *= self.height
-            return rgb, depth, K, np.linalg.pinv(K)
+            return line[0], rgb, depth, K, np.linalg.pinv(K)
 
         inputs = {}
 
@@ -451,7 +451,7 @@ class HabitatTrainDataset(data.Dataset):
         if do_flip:
             pass #todo implement flip for pose
 
-        return left_cam_pose
+        return left_cam_pose.astype(np.float32)
 
     def check_depth(self):
         return False
@@ -485,6 +485,6 @@ class HabitatTrainDataset(data.Dataset):
 #     frame_ids = [0, -4, -3, -2, -1, 1, 2, 3, 4]
 #     num_scales = 4
 #     train_dataset = HabitatTrainDataset(data_path, train_filenames, height, width, frame_ids, num_scales,
-#                                         is_train=True, segment_path=segment_path, return_segment=True)
+#                                         is_train=False, segment_path=segment_path, return_segment=True)
 #     data = train_dataset.__getitem__(0)
 #     print()
