@@ -6482,11 +6482,6 @@
 2azQ1b91cZZ/0/left_rgb/6481.jpg 2azQ1b91cZZ/0/left_depth/6481.png
 2azQ1b91cZZ/0/left_rgb/6482.jpg 2azQ1b91cZZ/0/left_depth/6482.png
 2azQ1b91cZZ/0/left_rgb/6483.jpg 2azQ1b91cZZ/0/left_depth/6483.png
-2azQ1b91cZZ/0/left_rgb/6484.jpg 2azQ1b91cZZ/0/left_depth/6484.png
-2azQ1b91cZZ/0/left_rgb/6485.jpg 2azQ1b91cZZ/0/left_depth/6485.png
-2azQ1b91cZZ/0/left_rgb/6486.jpg 2azQ1b91cZZ/0/left_depth/6486.png
-2azQ1b91cZZ/0/left_rgb/6487.jpg 2azQ1b91cZZ/0/left_depth/6487.png
-2azQ1b91cZZ/0/left_rgb/6488.jpg 2azQ1b91cZZ/0/left_depth/6488.png
 2azQ1b91cZZ/0/left_rgb/6489.jpg 2azQ1b91cZZ/0/left_depth/6489.png
 2azQ1b91cZZ/0/left_rgb/6490.jpg 2azQ1b91cZZ/0/left_depth/6490.png
 2azQ1b91cZZ/0/left_rgb/6491.jpg 2azQ1b91cZZ/0/left_depth/6491.png
