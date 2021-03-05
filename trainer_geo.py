@@ -381,7 +381,7 @@ class Trainer:
             frame0_pose = inputs[('pose', 0)]
             for f_i in self.opt.frame_ids_to_train[1:]:
                 framei_pose = inputs[('pose', f_i)]
-                outputs[("cam_T_cam", 0, f_i)] = torch.matmul(torch.pinverse(framei_pose), frame0_pose)
+                outputs[("cam_T_cam", 0, f_i)] = torch.matmul(torch.inverse(framei_pose), frame0_pose)
 
         self.generate_sparse_pred(inputs, outputs)
         losses = self.compute_losses(inputs, outputs)
@@ -476,9 +476,6 @@ class Trainer:
                 mask = gt_depth > 0
                 pred_depth = pred_depth[mask]
                 gt_depth = gt_depth[mask]
-
-                if len(pred_depth) == 0:
-                    print(filename.cpu().detach())
 
                 ratio = np.median(gt_depth) / np.median(pred_depth)
                 pred_depth *= ratio
