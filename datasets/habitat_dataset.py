@@ -323,7 +323,7 @@ class HabitatTrainDataset(data.Dataset):
                 continue
 
             inputs[("color", i, -1)] = self.get_color(line[ind], do_flip)
-            inputs[("pose", i)] = torch.from_numpy(self.get_pose(line[ind], do_flip))
+            #inputs[("pose", i)] = torch.from_numpy(self.get_pose(line[ind], do_flip))
             if self.debug:
                 inputs[("color", i, -1)] = self.to_tensor(self.get_color(line[ind], do_flip))
 

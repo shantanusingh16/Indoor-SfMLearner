@@ -309,7 +309,7 @@ class ScannetTrainDataset(data.Dataset):
             K = self.K.copy()
             K[0, :] *= self.width
             K[1, :] *= self.height
-            return rgb, depth, K, np.linalg.pinv(K)
+            return line[0], rgb, depth, K, np.linalg.pinv(K)
 
         inputs = {}
 
