@@ -174,6 +174,9 @@ class Trainer:
 
         assert self.opt.frame_ids[0] == 0, "frame_ids must start with 0"
 
+        if self.opt.use_stereo:
+            self.opt.frame_ids_to_train.append('s')
+
         self.use_pose_net = self.opt.pose_model_type != "ground_truth"
 
         self.models["encoder"] = networks.ResnetEncoder(

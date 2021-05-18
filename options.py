@@ -97,6 +97,9 @@ class MonodepthOptions:
                                  default=[0, -2, -1, 1, 2])
 #                                 choices=[[0, -1, 1],
 #                                          [0, -2, -1, 1, 2]])
+        self.parser.add_argument("--use_stereo",
+                                 help="if set uses stereo in addition to above frame_ids for training",
+                                 action="store_true")
 
         # OPTIMIZATION options
         self.parser.add_argument("--batch_size",
