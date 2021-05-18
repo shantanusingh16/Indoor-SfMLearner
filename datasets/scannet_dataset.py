@@ -192,7 +192,8 @@ class ScannetTrainDataset(data.Dataset):
                  is_train=False,
                  segment_path='',
                  return_segment=False,
-                 shared_dict=None):
+                 shared_dict=None,
+                 use_stereo=False):
         super(ScannetTrainDataset, self).__init__()
 
         self.debug = False

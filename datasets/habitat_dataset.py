@@ -191,10 +191,12 @@ class HabitatTrainDataset(data.Dataset):
                  is_train=False,
                  segment_path='',
                  return_segment=False,
-                 shared_dict=None):
+                 shared_dict=None,
+                 use_stereo=False):
         super(HabitatTrainDataset, self).__init__()
 
         self.debug = False
+        self.use_stereo = use_stereo
         self.return_segment = return_segment
         # remove 16 pixels from borders
         self.full_res_shape = (640, 480)
@@ -329,7 +331,7 @@ class HabitatTrainDataset(data.Dataset):
             if self.debug:
                 inputs[("color", i, -1)] = self.to_tensor(self.get_color(line[ind], do_flip))
 
-        if 's' in self.frame_idxs:
+        if self.use_stereo:
             inputs[("color", "s", -1)] = self.get_stereo_right(line[0], do_flip)
             inputs[("cam_T_cam", 0, "s")] = torch.from_numpy(self.get_stereo_pose()).float()
 

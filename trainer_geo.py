@@ -175,7 +175,6 @@ class Trainer:
         assert self.opt.frame_ids[0] == 0, "frame_ids must start with 0"
 
         if self.opt.use_stereo:
-            self.opt.frame_ids.append('s')
             self.opt.frame_ids_to_train.append('s')
 
         self.use_pose_net = self.opt.pose_model_type != "ground_truth"
@@ -250,7 +249,7 @@ class Trainer:
             self.opt.data_path, train_filenames, self.opt.height, self.opt.width,
             self.opt.frame_ids, self.num_scales, is_train=True,
             segment_path=self.opt.segment_path,
-            return_segment=True)
+            return_segment=True, use_stereo=self.opt.use_stereo)
 
         self.train_loader = DataLoader(
             train_dataset, self.opt.batch_size, True,
