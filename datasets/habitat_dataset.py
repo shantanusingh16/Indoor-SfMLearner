@@ -313,6 +313,8 @@ class HabitatTrainDataset(data.Dataset):
         inputs = {}
 
         do_color_aug = self.is_train and random.random() > 0.5
+
+        # Disabled to avoid issues with stereo
         do_flip = False #self.is_train and random.random() > 0.5
 
         line = self.filenames[index].split()
@@ -326,6 +328,10 @@ class HabitatTrainDataset(data.Dataset):
             #inputs[("pose", i)] = torch.from_numpy(self.get_pose(line[ind], do_flip))
             if self.debug:
                 inputs[("color", i, -1)] = self.to_tensor(self.get_color(line[ind], do_flip))
+
+        if 's' in self.frame_idxs:
+            inputs[("color", "s", -1)] = self.get_stereo_right(line[0], do_flip)
+            inputs[("cam_T_cam", 0, "s")] = self.get_stereo_pose()
 
         # load segments
         if self.return_segment:
@@ -398,15 +404,14 @@ class HabitatTrainDataset(data.Dataset):
             inputs[("inv_K", scale)] = torch.from_numpy(inv_K)
 
         if do_color_aug:
-            color_aug = transforms.ColorJitter.get_params(
-                self.brightness, self.contrast, self.saturation, self.hue)
+            color_aug = transforms.ColorJitter(self.brightness, self.contrast, self.saturation, self.hue)
         else:
             color_aug = (lambda x: x)
 
         self.preprocess(inputs, color_aug)
 
         for i in self.frame_idxs:
-            if not i in set([0, -2, -1, 1, 2]):
+            if not i in set([0, -2, -1, 1, 2, 's']):
                 continue
 
             del inputs[("color", i, -1)]
@@ -432,6 +437,15 @@ class HabitatTrainDataset(data.Dataset):
 
         return Image.fromarray(color)
 
+    def get_stereo_right(self, left_fp, do_flip):
+        right_fp = left_fp.replace('left_rgb', 'right_rgb')
+        return self.get_color(right_fp, do_flip)
+
+    def get_stereo_pose(self):
+        T = np.eye(4)
+        T[0, 3] = 0.2  # Baseline along x-axis with length 0.2m
+        return T
+
     def get_pose(self, fp, do_flip):
         filename_wo_extn = os.path.splitext(os.path.basename(fp))[0]
         folder = os.path.dirname(os.path.dirname(fp))
@@ -442,7 +456,7 @@ class HabitatTrainDataset(data.Dataset):
             "{}.npy".format(filename_wo_extn))
 
         robot_pose = np.vstack([np.load(pose_path).astype(np.float32), [0,0,0,1]])
-        left_local_cam = np.array([-0.25, 1, 0, 1])
+        left_local_cam = np.array([-0.1, 1, 0, 1])
 
         left_world_cam = (robot_pose @ left_local_cam)
 
@@ -470,7 +484,7 @@ class HabitatTrainDataset(data.Dataset):
         w, h = self.full_res_shape
 
         intrinsics = np.array([[640 / w, 0., 320 / w, 0.],
-                               [0., 480 / h, 240 / h, 0.],
+                               [0., 640 / h, 240 / h, 0.],
                                [0., 0., 1., 0.],
                                [0., 0., 0., 1.]], dtype="float32")
         return intrinsics

@@ -405,7 +405,7 @@ class Trainer:
 
             assert self.opt.frame_ids == [0, -4, -3, -2, -1, 1, 2, 3, 4]
             for f_i in [-2, -1, 0, 1] if len(self.opt.frame_ids_to_train) == 5 else [-1, 0]:
-                if f_i != "s":
+                if f_i != "s" and f_i in self.opt.frame_ids_to_train:
                     # To maintain ordering we always pass frames in temporal order
                     pose_inputs = [pose_feats[f_i], pose_feats[f_i + 1]]
 
@@ -422,13 +422,14 @@ class Trainer:
                     outputs[("cam_T_cam", f_i, f_i + 1)] = transformation_from_parameters(
                         axisangle[:, 0], translation[:, 0], invert=False)
 
-            if len(self.opt.frame_ids_to_train) == 5: 
+            if np.all([i in self.opt.frame_ids_to_train for i in [0, -2, -1, 1, 2]]):
                 outputs[("cam_T_cam", 0, 2)] = outputs[("cam_T_cam", 0, 1)] @ outputs[("cam_T_cam", 1, 2)]
                 outputs[("cam_T_cam", -2, 0)] = outputs[("cam_T_cam", -2, -1)] @ \
                                                 outputs[("cam_T_cam", -1, 0)]
                 outputs[("cam_T_cam", 0, -2)] = inv_SE3(outputs[("cam_T_cam", -2, 0)])
 
-            outputs[("cam_T_cam", 0, -1)] = inv_SE3(outputs[("cam_T_cam", -1, 0)])
+            if ("cam_T_cam", -1, 0) in outputs:
+                outputs[("cam_T_cam", 0, -1)] = inv_SE3(outputs[("cam_T_cam", -1, 0)])
 
         else:
             # Here we input all frames to the pose net (and predict all poses) together
@@ -450,6 +451,9 @@ class Trainer:
                     outputs[("translation", 0, f_i)] = translation
                     outputs[("cam_T_cam", 0, f_i)] = transformation_from_parameters(
                         axisangle[:, i], translation[:, i])
+
+        if 's' in self.opt.frame_ids_to_train:
+            outputs[("cam_T_cam", 0, "s")] = inputs[("cam_T_cam", 0, "s")]
 
         return outputs
 
