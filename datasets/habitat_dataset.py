@@ -331,7 +331,7 @@ class HabitatTrainDataset(data.Dataset):
 
         if 's' in self.frame_idxs:
             inputs[("color", "s", -1)] = self.get_stereo_right(line[0], do_flip)
-            inputs[("cam_T_cam", 0, "s")] = self.get_stereo_pose()
+            inputs[("cam_T_cam", 0, "s")] = torch.from_numpy(self.get_stereo_pose()).float()
 
         # load segments
         if self.return_segment:
