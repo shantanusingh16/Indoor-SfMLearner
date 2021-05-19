@@ -316,8 +316,7 @@ class HabitatTrainDataset(data.Dataset):
 
         do_color_aug = self.is_train and random.random() > 0.5
 
-        # Disabled to avoid issues with stereo
-        do_flip = False #self.is_train and random.random() > 0.5
+        do_flip = self.is_train and random.random() > 0.5
 
         line = self.filenames[index].split()
         # line = [l.replace("/group/nyu_depth_v2", self.data_path) for l in line]
@@ -333,7 +332,7 @@ class HabitatTrainDataset(data.Dataset):
 
         if self.use_stereo:
             inputs[("color", "s", -1)] = self.get_stereo_right(line[0], do_flip)
-            inputs[("cam_T_cam", 0, "s")] = torch.from_numpy(self.get_stereo_pose()).float()
+            inputs[("cam_T_cam", 0, "s")] = torch.from_numpy(self.get_stereo_pose(do_flip)).float()
 
         # load segments
         if self.return_segment:
@@ -443,9 +442,10 @@ class HabitatTrainDataset(data.Dataset):
         right_fp = left_fp.replace('left_rgb', 'right_rgb')
         return self.get_color(right_fp, do_flip)
 
-    def get_stereo_pose(self):
+    def get_stereo_pose(self, do_flip):
         T = np.eye(4)
-        T[0, 3] = 0.2  # Baseline along x-axis with length 0.2m
+        flip_sign = -1 if do_flip else 1
+        T[0, 3] = -0.2 * flip_sign  # Baseline along x-axis with length 0.2m
         return T
 
     def get_pose(self, fp, do_flip):

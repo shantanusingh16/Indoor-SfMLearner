@@ -408,7 +408,7 @@ class Trainer:
 
             assert self.opt.frame_ids == [0, -4, -3, -2, -1, 1, 2, 3, 4]
             for f_i in [-2, -1, 0, 1] if len(self.opt.frame_ids_to_train) == 5 else [-1, 0]:
-                if f_i != "s" and f_i in self.opt.frame_ids_to_train:
+                if f_i != "s" and f_i in self.opt.frame_ids_to_train and (f_i+1) in self.opt.frame_ids_to_train:
                     # To maintain ordering we always pass frames in temporal order
                     pose_inputs = [pose_feats[f_i], pose_feats[f_i + 1]]
 
